@@ -70,6 +70,12 @@ namespace Plex_Util
 
     private void HandleScanButtonClickedEvent(object sender, RoutedEventArgs e)
     {
+      if(string.IsNullOrEmpty(plexInput) || !Directory.Exists(plexInput))
+      {
+        MessageBox.Show(string.IsNullOrEmpty(plexInput) ? "No input folder specified." : $"Folder {plexInput} not found.", "Invalid input folder", MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+
       plexItems.Clear();
       foreach (string directory in Directory.GetDirectories(plexInput))
       {

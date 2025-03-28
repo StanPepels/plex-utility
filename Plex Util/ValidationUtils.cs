@@ -8,6 +8,9 @@ namespace Plex_Util
 {
   public class ValidationUtils
   {
+    /// <summary>
+    /// Checks a file / folder path for invalid characters on windows.
+    /// </summary>
     public static bool CheckWindowsFileName(string fileName)
     {
       // List of invalid characters for a Windows file name

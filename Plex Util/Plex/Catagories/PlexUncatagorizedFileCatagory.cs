@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Plex_Util
 {
-
   public class PlexUncatagorizedFileCatagory : IPlexCatagory
   {
     public string Catagory => "Uncatagorized";

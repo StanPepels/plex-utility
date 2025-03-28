@@ -11,6 +11,9 @@ namespace Plex_Util
 {
   public static class HorizontalGradientAnimation
   {
+    /// <summary>
+    /// Utility that creates a brush to create a horizontal gradient.
+    /// </summary>
     public static LinearGradientBrush Create(Color fadeColor, Color fillColor, float fillColorAspect)
     {
       var brush = new LinearGradientBrush

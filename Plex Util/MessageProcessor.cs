@@ -10,6 +10,10 @@ using System.Windows.Threading;
 
 namespace Plex_Util
 {
+  /// <summary>
+  /// Uses a separate thread to handle update requests for <see cref="MakeMKVItem"/>. If a lot of updates are requested in a short period of time the update is batched into 1.
+  /// This ensures the UI thread will not be overloaded if a lot of update requests are done in a short amount of time. The thread updates the ui thread every 10 ms.
+  /// </summary>
   public class ItemProgressUpdater
   {
     private Dispatcher dispatcher;

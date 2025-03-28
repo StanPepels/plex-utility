@@ -4,8 +4,16 @@ using System.Linq;
 
 namespace Plex_Util
 {
+  /// <summary>
+  /// Represents a folder which contains data for a plex item such as a mobie or series.
+  /// </summary>
   public class PlexFolder
   {
+    /// <summary>
+    /// Creates a plex folder from a local folder by scanning the local folder and putting all the files in appropriate catagories.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     public static PlexFolder BuildFolderStructure(string path)
     {
       IPlexCatagory[] catagories = new IPlexCatagory[] {

@@ -11,6 +11,14 @@ namespace Plex_Util
   public delegate void ProcessOutput(object sender, DataReceivedEventArgs args);
   public static class ProcessUtils
   {
+    /// <summary>
+    /// Runs a process to completion async.
+    /// </summary>
+    /// <param name="processStartInfo"></param>
+    /// <param name="cancellationTokenSource">cancelattion token used to kill the program if the user want to prematurely stop the process.</param>
+    /// <param name="stdout">Callback for receiving stdout messages</param>
+    /// <param name="stderr">Callback for receiving stderr messages</param>
+    /// <returns></returns>
     public async static Task<int> RunProcessToCompletionAsync(ProcessStartInfo processStartInfo, CancellationTokenSource cancellationTokenSource, ProcessOutput stdout = null, ProcessOutput stderr = null)
     {
       Process process = new Process();

@@ -336,12 +336,15 @@ namespace Plex_Util
                 progressUpdater.Start();
                 void UpdateProgress(int percent)
                 {
-                  currentItem.CurrentProgress = percent;
-                  int total = min + currentItem.CurrentProgress / step;
-                  currentItem.TotalProgress = total;
-                  progressUpdater.RequestUpdate(currentItem);
+                  if (percent != currentItem.CurrentProgress)
+                  {
+                    currentItem.CurrentProgress = percent;
+                    int total = min + currentItem.CurrentProgress / step;
+                    currentItem.TotalProgress = total;
+                    progressUpdater.RequestUpdate(currentItem);
+                  }
                 }
-                int exitCode = await Handbrake.Encode(EncodePresetPath, preset, titles[x], outputPath, Path.Combine(encodePath, $"{name}_T{x}.mkv"), currentItem, convertProcessToken, UpdateProgress);
+                int exitCode = await Handbrake.Encode(EncodePresetPath, preset, titles[x], outputPath, Path.Combine(encodePath, $"{name}_T{x}.mkv"), convertProcessToken, UpdateProgress);
                 progressUpdater.Stop();
                 if (convertProcessToken.IsCancellationRequested)
                 {

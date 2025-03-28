@@ -31,17 +31,5 @@ Note that this does not search subfolders. Additionally this will scan all found
 ### Aditional Options
 - **Skip Existing:** If a folder the out folder for an item already exists the item will be skipped.
 
-### Ripping dvds or blu-rays
-1. Use MakeMKV to backup the dvd or blu ray
-2. Follow the steps in the *Basic Usage (converter)* section
-3. Follow the steps in the *Basic Usage (plex metadata)* section
-4. Open winScm using the dedictaed button at the bottom of the plex metadata tab
-5. connect to the media server (raspberri pi)
-6. in win scp navigate to the remote host (right pane) media folder for plex. (/opt/plex/media should be default selected) 
-7. on the local pc (left pane) navigate to the media folder to be uploaded to plex (P:\Media\plex should be default selected)
-8. Press synchronize
-9. In the _Direction_ section. select _Remote_
-10. In the _Comparison criteria_ section. select _Modification time_ and _File size_
-11. Press ok 
-12. Verify the pending operations and select the ones to sync (or select all using the button on the right)
-13. Press Ok to start syncing the local files with the plex server. 
+### NOTE
+- In case a dependency cannot be found you can manually specify the install locations via Options -> preferences.

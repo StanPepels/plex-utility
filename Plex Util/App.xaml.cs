@@ -125,6 +125,12 @@ namespace Plex_Util
     {
       base.OnStartup(e);
       CreateLog();
+      AppDomain.CurrentDomain.UnhandledException += HandleUhandledException;
+    }
+
+    private void HandleUhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+      MessageBox.Show($"Encountered an unhandled exception: {e.ExceptionObject.GetType().FullName}.{(e.IsTerminating ? "Application will terminate.": string.Empty)}", "Unhandled Exception", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     protected override void OnExit(ExitEventArgs e)

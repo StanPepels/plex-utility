@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace Plex_Util
 {
+  /// <summary>
+  /// Utiltiy for executing the handbrake cli to scan and encode titles.
+  /// </summary>
   public static class Handbrake
   {
+    /// <summary>
+    /// Scans a file / folder path for titles and returns the title indices which can be passed to select what title to encode later.
+    /// </summary>
     public static async Task<(int exitcode, int[] titleIndices)> Scan(string outputPath, CancellationTokenSource cancellationTokenSource)
     {
       List<int> indices = new List<int>();
@@ -42,7 +48,18 @@ namespace Plex_Util
       return (exitCode, indices.ToArray());
     }
 
-    public static async Task<int> Encode(string encodePresetFilePath, string presetName, int titleIndex, string inputPath, string outputPath, MakeMKVItem item, CancellationTokenSource cancellationTokenSource, Action<int> progress = null)
+    /// <summary>
+    /// Encodes a title using a preset from a preset file.
+    /// </summary>
+    /// <param name="encodePresetFilePath">The preset file to read the settings from</param>
+    /// <param name="presetName">The name of the preset to use from the preset file.</param>
+    /// <param name="titleIndex">The index of the title to encode. <see cref="Handbrake.Scan(string, CancellationTokenSource)"/></param>
+    /// <param name="inputPath">The file / folder path to encode</param>
+    /// <param name="outputPath">The folder the encoded fiel will be placed in</param>
+    /// <param name="cancellationTokenSource"></param>
+    /// <param name="progress">Callback that can be used to handle progress updates on the encode.</param>
+    /// <returns></returns>
+    public static async Task<int> Encode(string encodePresetFilePath, string presetName, int titleIndex, string inputPath, string outputPath, CancellationTokenSource cancellationTokenSource, Action<int> progress = null)
     {
       ProcessStartInfo handbrakeProcess = new ProcessStartInfo();
       handbrakeProcess.FileName = App.HandbrakeCliPath;
@@ -59,10 +76,7 @@ namespace Plex_Util
         if (match.Success)
         {
           int current = int.Parse(match.Groups[1].Value);
-          if (current != item.CurrentProgress)
-          {
-            progress?.Invoke(current);
-          }
+          progress?.Invoke(current);
         }
       },
       (s, evt) =>

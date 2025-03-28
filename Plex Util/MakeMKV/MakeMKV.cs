@@ -13,6 +13,9 @@ namespace Plex_Util
 {
   public static class MakeMKV
   {
+    /// <summary>
+    /// Extracts all titles of a .iso or blu-ray folder as .mkv files.
+    /// </summary>
     public static async Task<int> ExtractAllTitles(MakeMKVItem item, string outputPath, CancellationTokenSource cancellationTokenSource, Dispatcher dispatcher)
     {
       ItemProgressUpdater progressUpdater = new ItemProgressUpdater(dispatcher);
@@ -38,6 +41,10 @@ namespace Plex_Util
       return exitCode;
     }
 
+
+    /// <summary>
+    /// Extracts a single title of a .iso or blu-ray folder as .mkv files.
+    /// </summary>
     public static async Task<int> ExtractTitle(MakeMKVItem item, string outputPath, TitleInfo title, CancellationTokenSource cancellationTokenSource, Dispatcher dispatcher)
     {
       ItemProgressUpdater progressUpdater = new ItemProgressUpdater(dispatcher);
@@ -63,6 +70,10 @@ namespace Plex_Util
       return exitCode;
     }
 
+    /// <summary>
+    /// Scans a .iso or blu-ray folder for titles which can be extracted using <see cref="ExtractAllTitles(MakeMKVItem, string, CancellationTokenSource, Dispatcher)"/> and <see cref="ExtractTitle(MakeMKVItem, string, TitleInfo, CancellationTokenSource, Dispatcher)"/>
+    /// </summary>
+    /// <returns></returns>
     public static async Task<int> ScanTitles(MakeMKVItem item, CancellationTokenSource cancellationTokenSource, Dispatcher dispatcher)
     {
       ItemProgressUpdater progressUpdater = new ItemProgressUpdater(dispatcher);

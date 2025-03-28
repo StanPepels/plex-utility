@@ -4,6 +4,10 @@ using System.IO;
 
 namespace Plex_Util
 {
+  /// <summary>
+  ///  Represents a media file in a plex file catagory such as .mkv file
+  ///  <see cref="PlexFileCatagory"/>
+  /// </summary>
   public class PlexFile : INotifyPropertyChanged
   {
     public string FilePath

@@ -9,6 +9,9 @@ using System.Windows;
 
 namespace Plex_Util
 {
+  /// <summary>
+  /// A cotagory that contains subfolders.
+  /// </summary>
   public class PlexFolderCatagory : IPlexCatagory
   {
     public string Catagory => catagory;

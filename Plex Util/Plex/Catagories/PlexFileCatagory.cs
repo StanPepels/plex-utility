@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Plex_Util
 {
+  /// <summary>
+  /// A catagory that holds media files.
+  /// </summary>
   public class PlexFileCatagory : IPlexCatagory
   {
     public string Catagory => catagory;
