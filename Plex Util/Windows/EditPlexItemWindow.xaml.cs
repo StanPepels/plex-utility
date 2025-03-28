@@ -95,9 +95,6 @@ namespace Plex_Util
             Dispatcher.Invoke(() =>
             {
               GetCursorPosition(out int x, out int y);
-
-              //Point relative = scrollViewer.PointFromScreen(new Point { X = x, Y = y});
-              // ScrollIfNeeded(relative.Y);
               ScrollIfNeeded(y);
             });
           }
