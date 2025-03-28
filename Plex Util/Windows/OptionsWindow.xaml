@@ -1,0 +1,36 @@
+﻿<Window x:Class="Plex_Util.OptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Plex_Util"
+        mc:Ignorable="d"
+        Title="OptionsWindow" Height="450" Width="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition  Height="auto"></RowDefinition>
+      <RowDefinition  Height="auto"></RowDefinition>
+      <RowDefinition  Height="auto"></RowDefinition>
+      <RowDefinition  Height="auto"></RowDefinition>
+      <RowDefinition  Height="auto"></RowDefinition>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto"></ColumnDefinition>
+      <ColumnDefinition></ColumnDefinition>
+    </Grid.ColumnDefinitions>
+    <Label Grid.Column="0" Grid.Row="0" Content="makemkvcon.exe location:"  Margin="5"></Label>
+    <local:PathSelectControl IsFile="True" Grid.Column="1" Grid.Row="0" Path="{Binding MakeMKVPathOverride, Mode=TwoWay}"></local:PathSelectControl>
+
+    <Label Grid.Column="0" Grid.Row="1" Content="vlc.exe location:"  Margin="5"></Label>
+    <local:PathSelectControl IsFile="True" Grid.Column="1" Grid.Row="1" Path="{Binding VLCPathOverride, Mode=TwoWay}"></local:PathSelectControl>
+
+    <Label Grid.Column="0" Grid.Row="2" Content="winscp.exe location:"  Margin="5"></Label>
+    <local:PathSelectControl IsFile="True" Grid.Column="1" Grid.Row="2" Path="{Binding WinSCPPathOverride, Mode=TwoWay}"></local:PathSelectControl>
+
+    <Label Grid.Column="0" Grid.Row="3" Content="handbrake.exe location:"  Margin="5"></Label>
+    <local:PathSelectControl IsFile="True" Grid.Column="1" Grid.Row="3" Path="{Binding HandbrakePathOverride, Mode=TwoWay}"></local:PathSelectControl>
+
+    <Label Grid.Column="0" Grid.Row="4" Content="handbrakecli.exe location:"  Margin="5"></Label>
+    <local:PathSelectControl IsFile="True" Grid.Column="1" Grid.Row="4" Path="{Binding HandbrakeCliOverride, Mode=TwoWay}"></local:PathSelectControl>
+  </Grid>
+</Window>

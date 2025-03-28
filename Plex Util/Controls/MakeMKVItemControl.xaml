@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="Plex_Util.MakeMKVItemControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Plex_Util"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+  <Control.Resources>
+    <local:VisibilityConverter x:Key="BoolToVis"/>
+    <local:StringNullOrEmptyConverter x:Key="StringNullOrEmptyConverter" />
+  </Control.Resources>
+  <Grid  HorizontalAlignment="Stretch" Margin="5,2">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="8*" ></ColumnDefinition>
+      <ColumnDefinition Width="3*" ></ColumnDefinition>
+      <ColumnDefinition Width="3*" ></ColumnDefinition>
+      <ColumnDefinition Width="160" ></ColumnDefinition>
+      <ColumnDefinition Width="160"></ColumnDefinition>
+      <ColumnDefinition Width="3*"></ColumnDefinition>
+      <ColumnDefinition Width="auto" ></ColumnDefinition>
+      <ColumnDefinition Width="auto" ></ColumnDefinition>
+      <ColumnDefinition Width="auto" ></ColumnDefinition>
+    </Grid.ColumnDefinitions>
+    <TextBlock x:Name="errorMessage" VerticalAlignment="Center" Grid.Column="0" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding Error, UpdateSourceTrigger=PropertyChanged}" Foreground="Red"></TextBlock>
+    <TextBlock VerticalAlignment="Center" Grid.Column="0" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding FilePath}">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock">
+          <Setter Property="Visibility" Value="Visible" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Error, Converter={StaticResource StringNullOrEmptyConverter}}" Value="True">
+              <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+
+    </TextBlock>
+    <TextBlock VerticalAlignment="Center" Grid.Column="1" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding SizeText, UpdateSourceTrigger=PropertyChanged}" ></TextBlock>
+    <TextBlock VerticalAlignment="Center" Grid.Column="2" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding TitleCountText, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+    <local:ProgressControl Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Text="{Binding CurrentProgressText}" Maximum="{Binding ProgressMaxValue, Mode=TwoWay}" Value="{Binding CurrentProgress, Mode=TwoWay}" Visibility="{Binding HasProgress, Mode=TwoWay, Converter={StaticResource BoolToVis}}"></local:ProgressControl>
+    <local:ProgressControl Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Text="{Binding TotalProgressText}" Maximum="{Binding ProgressMaxValue, Mode=TwoWay}" Value="{Binding TotalProgress, Mode=TwoWay}" Visibility="{Binding HasProgress, Mode=TwoWay, Converter={StaticResource BoolToVis}}"></local:ProgressControl>
+
+    <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Grid.Column="5" HorizontalAlignment="Left" MinWidth="100" Text="{Binding StatusText, Mode=TwoWay}"></TextBlock>
+    <Button Style="{StaticResource ActionButton}" Background="red" Click="RemoveItemClick" ToolTip="Remove" Padding="0,2" Margin="5,0" Grid.Column="6" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+      <Image Source="/Resources/Images/bin.png" Height="14"></Image>
+    </Button>
+    <Button Style="{StaticResource ActionButton}" Click="CopyItemClick" ToolTip="Copy Path" Padding="0,2" Margin="5,0" Grid.Column="7" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+      <Image Source="/Resources/Images/copy.png" Height="14"></Image>
+    </Button>
+    <Button Style="{StaticResource ActionButton}" Visibility="{Binding ShowRemoveButton, Converter={StaticResource BoolToVis}, ConverterParameter=True}" Click="ModifyItemClicked" ToolTip="modify" Padding="0,2" Margin="5,0" Grid.Column="8" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+      <Image Source="/Resources/Images/modify.png" Height="14"></Image>
+    </Button>
+  </Grid>
+</UserControl>

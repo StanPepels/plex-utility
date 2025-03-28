@@ -1,0 +1,174 @@
+﻿<Window x:Class="Plex_Util.EditPlexItemWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Plex_Util"
+        mc:Ignorable="d"
+        Title="EditPlexItemWindow" Height="450" Width="800">
+  <Window.Resources>
+
+    <Style x:Key="ValidationBox" TargetType="TextBox">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type TextBox}">
+            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+              <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+            </Border>
+            <ControlTemplate.Triggers>
+
+              <Trigger Property="IsFocused" Value="True">
+                <Setter Property="BorderBrush" Value="LightBlue"/>
+                <Setter Property="BorderThickness" Value="1"/>
+              </Trigger>
+
+              <DataTrigger Binding="{Binding IsValidValue, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                <Setter Property="BorderBrush" Value="Red"/>
+                <Setter Property="BorderThickness" Value="2"/>
+              </DataTrigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <local:SharedSizeGroupConverter x:Key="SharedSizeGroupConverter"/>
+    <HierarchicalDataTemplate  DataType="{x:Type local:PlexFolder}" ItemsSource="{Binding Catagories}">
+      <Grid HorizontalAlignment="Stretch" AllowDrop="true" DragEnter="StackPanel_DragEnter" DragLeave="StackPanel_DragLeave_1" DragOver="StackPanel_DragOver_1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="auto" SharedSizeGroup="{Binding LocalPath, Converter={StaticResource SharedSizeGroupConverter}, ConverterParameter=Folder}"></ColumnDefinition>
+          <ColumnDefinition Width="*"></ColumnDefinition>
+          <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Content="{Binding Name}" FontWeight="Bold"/>
+        <ItemsControl Grid.Column="1" ItemsSource="{Binding Properties}"></ItemsControl>
+        <Button  Style="{StaticResource ActionButtonDelete}" Background="red" Click="Button_Click_2" ToolTip="Delete" Padding="0,2" Margin="5,0" Grid.Column="2" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+          <Image Source="/Resources/Images/bin.png" Height="14"></Image>
+        </Button>
+      </Grid>
+    </HierarchicalDataTemplate>
+
+    <!-- Main Template for Categories -->
+    <HierarchicalDataTemplate DataType="{x:Type local:PlexFolderCatagory}" ItemsSource="{Binding Folders}">
+      <StackPanel Orientation="Horizontal" AllowDrop="true" DragEnter="StackPanel_DragEnter" DragLeave="StackPanel_DragLeave_1" DragOver="StackPanel_DragOver_1">
+        <TextBlock Text="{Binding Catagory}" FontWeight="Bold"/>
+        <Button Style="{StaticResource ActionButton}" Click="Button_Click_1" ToolTip="Add" Padding="0,2" Margin="5,0" Grid.Column="2" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+          <Image Source="/Resources/Images/plus.png" Height="14"></Image>
+        </Button>
+      </StackPanel>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type local:PlexFileCatagory}" ItemsSource="{Binding Files}" AlternationCount="2">
+      <Grid HorizontalAlignment="Stretch" AllowDrop="True" DragOver="StackPanel_DragOver" Drop="StackPanel_Drop" DragLeave="StackPanel_DragLeave">
+        <DockPanel HorizontalAlignment="Stretch" >
+          <TextBlock Text="{Binding Catagory}" FontWeight="Bold"></TextBlock>
+        </DockPanel>
+      </Grid>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type local:PlexUncatagorizedFileCatagory}" ItemsSource="{Binding Files}" AlternationCount="2">
+      <StackPanel HorizontalAlignment="Stretch" AllowDrop="true" DragEnter="StackPanel_DragEnter" DragLeave="StackPanel_DragLeave_1" DragOver="StackPanel_DragOver_1">
+        <TextBlock Text="{Binding Catagory}" FontWeight="Bold"/>
+      </StackPanel>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type local:PlexAssetFileCatagory}" ItemsSource="{Binding Assets}" >
+      <StackPanel HorizontalAlignment="Stretch" AllowDrop="true" DragEnter="StackPanel_DragEnter" DragLeave="StackPanel_DragLeave_1" DragOver="StackPanel_DragOver_1">
+        <TextBlock Text="{Binding Catagory}" FontWeight="Bold"/>
+      </StackPanel>
+    </HierarchicalDataTemplate>
+    
+    <DataTemplate DataType="{x:Type local:PlexFile}">
+      <Grid DataContext="{Binding}" HorizontalAlignment="Stretch" MouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="auto" SharedSizeGroup="{Binding Parent, Converter={StaticResource SharedSizeGroupConverter}, ConverterParameter=File}"></ColumnDefinition>
+          <ColumnDefinition Width="auto" SharedSizeGroup="{Binding Parent, Converter={StaticResource SharedSizeGroupConverter}, ConverterParameter=FileLength}"></ColumnDefinition>
+          <ColumnDefinition Width="*"></ColumnDefinition>
+          <ColumnDefinition Width="auto"></ColumnDefinition>
+          <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Content="{Binding FileName}" FontWeight="Bold"/>
+        <Label Content="{Binding Duration}" Grid.Column="1" FontWeight="Bold"/>
+        <ItemsControl Grid.Column="2" ItemsSource="{Binding Properties}">
+          <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <DockPanel LastChildFill="True"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        <Button Style="{StaticResource ActionButton}" Click="OpenFileClick" ToolTip="Open in vlc" Padding="0,2" Margin="5,0" Grid.Column="3" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+          <Image Source="/Resources/Images/open.png" Height="14"></Image>
+        </Button>
+        <Button  Style="{StaticResource ActionButtonDelete}" Background="red" Click="DeleteClick" ToolTip="Delete" Padding="0,2" Margin="5,0" Grid.Column="4" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+          <Image Source="/Resources/Images/bin.png" Height="14"></Image>
+        </Button>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:PlexSeasonNumberFileProperty}">
+      <DockPanel>
+        <Label Content="{Binding Name}"></Label>
+        <TextBox VerticalAlignment="Center" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" MinWidth="50"></TextBox>
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:PlexEpisodeNumberFileProperty}">
+      <DockPanel>
+        <Label Content="{Binding Name}"></Label>
+        <TextBox Style="{StaticResource ValidationBox}" VerticalAlignment="Center" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" MinWidth="50">
+          
+        </TextBox>
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:PlexTitleProperty}">
+      <DockPanel>
+        <Label Content="{Binding Name}"></Label>
+        <TextBox  Style="{StaticResource ResourceKey=ValidationBox}" VerticalAlignment="Center" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" MinWidth="200">
+         
+        </TextBox>
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:PlexEpisodeTitleFileProperty}">
+      <DockPanel LastChildFill="True">
+        <Label Content="{Binding Name}"></Label>
+        <TextBox  Style="{StaticResource ResourceKey=ValidationBox}" VerticalAlignment="Center" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" MinWidth="200">
+          
+        </TextBox>
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:PlexMovieEditionFileProperty}">
+      <DockPanel LastChildFill="True" >
+        <Label Content="{Binding Name}"></Label>
+        <TextBox  Style="{StaticResource ResourceKey=ValidationBox}" VerticalAlignment="Center" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" MinWidth="200">
+         
+        </TextBox>
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:PlexAssetViewModel}">
+      <Grid HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"></ColumnDefinition>
+          <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Column="0" Name="inputLabel" Content="{Binding Name}"></Label>
+        <DockPanel LastChildFill="True"  Grid.Column="1" VerticalAlignment="Stretch">
+          <Button Click="Button_Click" DockPanel.Dock="Right" Content="..." Margin="5,0" Padding="5,0"  VerticalAlignment="Center"></Button>
+          <TextBox DockPanel.Dock="Left"   HorizontalAlignment="Stretch"  VerticalAlignment="Center" Text="{Binding FilePath, Mode=TwoWay}"></TextBox>
+        </DockPanel>
+      </Grid>
+    </DataTemplate>
+  </Window.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"></RowDefinition>
+      <RowDefinition Height="auto"></RowDefinition>
+    </Grid.RowDefinitions>
+    <TreeView Grid.IsSharedSizeScope="True" x:Name="treeView" ItemsSource="{Binding FolderCollection}" HorizontalContentAlignment="Stretch">
+    </TreeView>
+
+  </Grid>
+</Window>
