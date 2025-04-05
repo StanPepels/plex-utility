@@ -283,7 +283,7 @@ namespace Plex_Util
               string encodePath = GetEncodePathForItem(encodeDirectory, currentItem);
               string titleFolder = await ExtractTitlesFromDisk(outputPath, currentItem, convertProcessToken);
               int[] titleIndices = await ScanDirectoryForTitles(currentItem, titleFolder);
-              await EncodeTitles(currentItem, titleFolder, encodePath, titleIndices);
+              await EncodeTitles(currentItem, titleFolder, encodePath, titleIndices, convertProcessToken);
             }
           }
           catch (TaskCanceledException ex)
@@ -307,21 +307,24 @@ namespace Plex_Util
             App.Log.WriteLine($"==================================== Done Converting ====================================");
           }
           if (error != null) throw error;
-          Dispatcher.Invoke(() =>
+          if (!convertProcessToken.IsCancellationRequested)
           {
-            switch (whenDoneComboBox.SelectedIndex)
+            Dispatcher.Invoke(() =>
             {
-              case 1: // sleep
-                Sleep();
-                break;
-              case 2: // shutdown
-                Shutdown();
-                break;
-              case 0: // Do nothing
-              default:
-                break;
-            }
-          });
+              switch (whenDoneComboBox.SelectedIndex)
+              {
+                case 1: // sleep
+                  Sleep();
+                  break;
+                case 2: // shutdown
+                  Shutdown();
+                  break;
+                case 0: // Do nothing
+                default:
+                  break;
+              }
+            });
+          }
         }
         catch (Exception ex)
         {
@@ -419,7 +422,7 @@ namespace Plex_Util
       return titles;
     }
 
-    private async Task EncodeTitles(MakeMKVItem currentItem, string source, string encodePath, int[] titleIndices)
+    private async Task EncodeTitles(MakeMKVItem currentItem, string source, string encodePath, int[] titleIndices, CancellationTokenSource cancellationToken)
     {
       if (Directory.Exists(encodePath))
       {
@@ -446,9 +449,9 @@ namespace Plex_Util
             progressUpdater.RequestUpdate(currentItem);
           }
         }
-        int exitCode = await Handbrake.Encode(EncodePresetPath, preset, titleIndices[x], source, Path.Combine(encodePath, $"{name}_T{x}.mkv"), convertProcessToken, UpdateProgress);
+        int exitCode = await Handbrake.Encode(EncodePresetPath, preset, titleIndices[x], source, Path.Combine(encodePath, $"{name}_T{x}.mkv"), cancellationToken, UpdateProgress);
         progressUpdater.Stop();
-        if (convertProcessToken.IsCancellationRequested)
+        if (cancellationToken.IsCancellationRequested)
         {
           throw new TaskCanceledException();
         }
