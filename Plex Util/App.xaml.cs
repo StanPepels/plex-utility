@@ -1,15 +1,9 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Markup;
 
 namespace Plex_Util
 {
@@ -44,6 +38,11 @@ namespace Plex_Util
     static App()
     {
       UpdateDependencies();
+      if(!Power.ApplyShutdownPrivilidge())
+      {
+        MessageBox.Show("Failed to grant shutdown privileges. See log for details.", "Startup error", MessageBoxButton.OK, MessageBoxImage.Error);
+        App.Current.Shutdown();
+      }
     }
 
     public static void UpdateDependencies()

@@ -7,11 +7,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <TabItem.Header>
-      <StackPanel Orientation="Horizontal">
-        <TextBlock>Converter</TextBlock>
-      </StackPanel>
-    </TabItem.Header>
+  <TabItem.Header>
+    <StackPanel Orientation="Horizontal">
+      <TextBlock>Converter</TextBlock>
+    </StackPanel>
+  </TabItem.Header>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto"></RowDefinition>
@@ -24,6 +24,7 @@
         <ColumnDefinition></ColumnDefinition>
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
+        <RowDefinition Height="auto"></RowDefinition>
         <RowDefinition Height="auto"></RowDefinition>
         <RowDefinition Height="auto"></RowDefinition>
         <RowDefinition Height="auto"></RowDefinition>
@@ -46,11 +47,24 @@
       <Label Grid.Column="0" Grid.Row="4"  Content="Selected Preset"  Margin="5"></Label>
       <ComboBox  Grid.Column="1" Grid.Row="4" Name="presetOptions"  HorizontalAlignment="Stretch"  VerticalAlignment="Center" Margin="5,0" Padding="5,0" SelectedValue="{Binding Preset, Mode=TwoWay}"></ComboBox>
 
-      <Label Grid.Column="0" Grid.Row="5"  Content="Disk Space Usage:"  Margin="5"></Label>
-      <DockPanel LastChildFill="True"  Grid.Column="1" Grid.Row="5" VerticalAlignment="Stretch" Margin="5" >
-        <Button Click="RefreshDiskSpaceButton" DockPanel.Dock="Right" Content="Refresh" Margin="5,0" Padding="5,0"  VerticalAlignment="Center"></Button>
-        <TextBlock Name="diskSpaceText" Grid.Column="1"  Grid.Row="3"  VerticalAlignment="Center" Margin="5"></TextBlock>
-      </DockPanel>
+      <Label  Grid.Column="0"  Grid.Row="5"  Content="When Done"  Margin="5"></Label>
+      <ComboBox SelectedIndex="{Binding WhenDoneActionIndex, Mode=TwoWay}" Margin="5,0" Padding="5,0"  Name="whenDoneComboBox" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="5"></ComboBox>
+      
+      <Label  Grid.Column="0" Grid.Row="6"  Content="Disk Space Usage:"  Margin="5"></Label>
+      <Grid Grid.Column="1" Grid.Row="6" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"></ColumnDefinition>
+          <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Name="diskSpaceText" VerticalAlignment="Center" Margin="5"></TextBlock>
+        <Button Grid.Column="1" Click="RefreshDiskSpaceButton" DockPanel.Dock="Right" Content="Refresh" Margin="5,0" Padding="5,0"  VerticalAlignment="Center"></Button>
+      </Grid>
+      
+
+
     </Grid>
     <ListView Grid.ColumnSpan="1" HorizontalContentAlignment="Stretch" Name="processingList" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
       <ListView.ItemContainerStyle>

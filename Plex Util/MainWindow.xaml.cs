@@ -85,6 +85,7 @@ namespace Plex_Util
       settings.EncodePath = encodeTab.Encode;
       settings.EncodePreset = encodeTab.EncodePresetPath;
       settings.Preset = encodeTab.Preset;
+      settings.WhenDoneActionIndex = encodeTab.WhenDoneActionIndex;
       Settings.Save(settings);
     }
 
@@ -101,6 +102,7 @@ namespace Plex_Util
           encodeTab.Encode = settings.EncodePath;
           encodeTab.EncodePresetPath = settings.EncodePreset;
           encodeTab.Preset = settings.Preset;
+          encodeTab.WhenDoneActionIndex = settings.WhenDoneActionIndex;
         }
       }
       catch (Exception e)

@@ -71,6 +71,9 @@ namespace Plex_Util
     [XmlElement("MakeMKVPathOverride")]
     public string MakeMKVPathOverride { get; set; }
 
+    [XmlElement("WhenDoneActionIndex")]
+    public int WhenDoneActionIndex { get; set; }
+
     private static string settingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Media-Util", "settings.xml");
 
     /// <summary>

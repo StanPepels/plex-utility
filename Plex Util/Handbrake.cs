@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +16,10 @@ namespace Plex_Util
     /// <summary>
     /// Scans a file / folder path for titles and returns the title indices which can be passed to select what title to encode later.
     /// </summary>
-    public static async Task<(int exitcode, int[] titleIndices)> Scan(string outputPath, CancellationTokenSource cancellationTokenSource)
+    public static async Task<(int exitcode, int[] titleIndices, TitleInfo[] titles)> Scan(string outputPath, CancellationTokenSource cancellationTokenSource, Action<int> progress = null)
     {
-      List<int> indices = new List<int>();
+      Dictionary<string, int> indicesMap = new Dictionary<string, int>();
+      Dictionary<string, TitleInfo> titlesMap = new Dictionary<string, TitleInfo>();
       ProcessStartInfo handbrakeScanProcess = new ProcessStartInfo();
       handbrakeScanProcess.FileName = App.HandbrakeCliPath;
       handbrakeScanProcess.Arguments = $"-t 0 -i \"{outputPath}\"";
@@ -26,26 +28,59 @@ namespace Plex_Util
       handbrakeScanProcess.RedirectStandardError = true;
       handbrakeScanProcess.RedirectStandardOutput = true;
 
+      TitleInfo currentTitle = null;
+      void ProcessOutputLine(string line)
+      {
+        Match progressMatch = Regex.Match(line, @".*?(\d{1,3})\.\d{2} %");
+        if (progressMatch.Success)
+        {
+          int current = int.Parse(progressMatch.Groups[1].Value);
+          progress?.Invoke(current);
+        }
+
+        Match match = Regex.Match(line, @"\+\stitle\s(\d+)");
+        if (match.Success)
+        {
+          currentTitle = new TitleInfo();
+          indicesMap.Add(match.Groups[1].Value, int.Parse(match.Groups[1].Value));
+          titlesMap.Add(match.Groups[1].Value, currentTitle);
+        }
+        if (currentTitle != null)
+        {
+          Match streamMatch = Regex.Match(line, @"\s*\+\sstream:\s(.*)");
+          if (streamMatch.Success)
+          {
+            currentTitle.Name = streamMatch.Groups[1].Value;
+            currentTitle.Size = new FileInfo(currentTitle.Name).Length;
+          }
+          Match durationMatch = Regex.Match(line, @"\s*\+\sduration:\s(\d{2}:\d{2}:\d{2})");
+          if (durationMatch.Success)
+          {
+            currentTitle.Length = durationMatch.Groups[1].Value;
+          }
+        }
+      }
+
+
       int exitCode = await ProcessUtils.RunProcessToCompletionAsync(handbrakeScanProcess, cancellationTokenSource, (s, evt) =>
       {
         App.Log.WriteLine($"[Handbrake] [Info]  : {evt.Data}");
-        Match match = Regex.Match(evt.Data, @"\+\stitle\s(\d+)");
-        if (match.Success)
-        {
-          indices.Add(int.Parse(match.Groups[1].Value));
-        }
-
+        ProcessOutputLine(evt.Data);
       }, (s, evt) =>
       {
         App.Log.WriteLine($"[Handbrake] [Info]  : {evt.Data}");
-        Match match = Regex.Match(evt.Data, @"\+\stitle\s(\d+)");
-        if (match.Success)
-        {
-          indices.Add(int.Parse(match.Groups[1].Value));
-        }
+        ProcessOutputLine(evt.Data);
       });
 
-      return (exitCode, indices.ToArray());
+      List<int> indices = new List<int>();
+      List<TitleInfo> titles = new List<TitleInfo>();
+      foreach (KeyValuePair<string, TitleInfo> entry in titlesMap)
+      {
+        indices.Add(indicesMap[entry.Key]);
+        titles.Add(entry.Value);
+      }
+
+      return (exitCode, indices.ToArray(), titles.ToArray());
     }
 
     /// <summary>

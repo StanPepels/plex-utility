@@ -7,12 +7,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Plex_Util
 {
@@ -118,6 +120,18 @@ namespace Plex_Util
       }
     }
 
+    public int WhenDoneActionIndex
+    {
+      get => whenDoneActionIndex;
+      set
+      {
+        if (whenDoneActionIndex != value && value >= 0 && value < whenDoneOptions.Count)
+        {
+          whenDoneActionIndex = value;
+          OnPropertyChanged(nameof(WhenDoneActionIndex));
+        }
+      }
+    }
 
     public event PropertyChangedEventHandler PropertyChanged;
     public ObservableCollection<MakeMKVItem> makeMKVItems;
@@ -130,15 +144,25 @@ namespace Plex_Util
     private Task processingTask;
     private CancellationTokenSource convertProcessToken;
     private bool skipExistingItems;
+    private int whenDoneActionIndex;
+
+    private List<string> whenDoneOptions = new List<string>
+    {
+      "Do Nothing",
+      "Sleep",
+      "Shutdown"
+    };
 
     public EncodeTab()
     {
+      List<string> t = new List<string>();
       makeMKVItems = new ObservableCollection<MakeMKVItem>();
       InitializeComponent();
       DataContext = this;
       processingList.ItemsSource = makeMKVItems;
       App.OnDependenciesUpdated += HandleDependenciesUpdatedEvent;
       HandleDependenciesUpdatedEvent();
+      whenDoneComboBox.ItemsSource = whenDoneOptions;
     }
 
     private void HandleDependenciesUpdatedEvent()
@@ -171,13 +195,15 @@ namespace Plex_Util
       makeMKVItems.Clear();
       foreach (string file in Directory.GetFiles(input, "*.iso"))
       {
-        makeMKVItems.Add(new MakeMKVItem() { FilePath = file });
+        makeMKVItems.Add(new MakeMKVItem() { FilePath = file, Type = EMakeMKVItemType.Dvd, StatusText = "(Ready for scan)" });
       }
 
       foreach (string directory in Directory.GetDirectories(input))
       {
-        if (!Directory.Exists(Path.Combine(directory, "BDMV"))) continue;
-        makeMKVItems.Add(new MakeMKVItem() { FilePath = directory, StatusText = "(Ready for scan)" });
+        if (Directory.Exists(Path.Combine(directory, "BDMV")) || Directory.GetFiles(directory, "*.mkv", SearchOption.AllDirectories).Length > 0)
+        {
+          makeMKVItems.Add(new MakeMKVItem() { FilePath = directory, StatusText = "(Ready for scan)", Type = Directory.Exists(Path.Combine(directory, "BDMV")) ? EMakeMKVItemType.BluRay : EMakeMKVItemType.Mkv });
+        }
       }
 
       Scan();
@@ -209,7 +235,7 @@ namespace Plex_Util
           else
           {
             int conversionCount = makeMKVItems.Count(item => skipExistingItems ? !Directory.Exists(GetOutputPathForItem(outputDirectory, item)) || !Directory.Exists(GetEncodePathForItem(encodeDirectory, item)) : true);
-            MessageBoxResult result = MessageBox.Show($"This will start converting {conversionCount} items.\n Do you wich to continue?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            MessageBoxResult result = MessageBox.Show($"This will start converting {conversionCount} items.\n Do you wish to continue?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Information);
             if (result == MessageBoxResult.No)
             {
               return;
@@ -255,117 +281,17 @@ namespace Plex_Util
 
               string outputPath = GetOutputPathForItem(outputDirectory, currentItem);
               string encodePath = GetEncodePathForItem(encodeDirectory, currentItem);
-              if (Directory.Exists(outputPath) && !skipExistingItems)
-              {
-                Directory.Delete(outputPath, true);
-              }
-              if (!Directory.Exists(outputPath))
-              {
-                Directory.CreateDirectory(outputPath);
-                List<TitleInfo> selected = currentItem.GetSelectedTitles();
-                if (selected.Count == currentItem.TitleCount)
-                {
-                  int exitCode = await MakeMKV.ExtractAllTitles(currentItem, outputPath, convertProcessToken, Dispatcher);
-                  if (convertProcessToken.IsCancellationRequested)
-                  {
-                    for (int j = i; j < itemsToConvert.Count; j++)
-                    {
-                      itemsToConvert[j].StatusText = "(Cancelled)";
-                    }
-                    throw new TaskCanceledException();
-                  }
-                  if (exitCode != 0)
-                  {
-                    currentItem.StatusText = "(Failed)";
-                    throw new Exception($"Failed to convert item {currentItem.FilePath}. Check the log for more details.");
-                  }
-                }
-                else
-                {
-                  // slow but ok
-                  for (int x = 0; x < selected.Count; x++)
-                  {
-                    TitleInfo title = selected[x];
-                    int exitCode = await MakeMKV.ExtractTitle(currentItem, outputPath, title, convertProcessToken, Dispatcher);
-                    if (convertProcessToken.IsCancellationRequested)
-                    {
-                      for (int j = i; j < itemsToConvert.Count; j++)
-                      {
-                        itemsToConvert[j].StatusText = "(Cancelled)";
-                      }
-                      throw new TaskCanceledException();
-                    }
-                    if (exitCode != 0)
-                    {
-                      currentItem.StatusText = "(Failed)";
-                      throw new Exception($"Failed to convert item {currentItem.FilePath}. Check the log for more details.");
-                    }
-                  }
-                }
-              }
-
-
-              currentItem.StatusText = "(Scanning for titles)";
-              currentItem.ResetProgress();
-              if (Directory.Exists(encodePath))
-              {
-                Directory.Delete(encodePath, true);
-              }
-              Directory.CreateDirectory(encodePath);
-              int[] titles;
-              {
-                (int exitCode, int[] indices) = await Handbrake.Scan(outputPath, convertProcessToken);
-                if (exitCode != 0)
-                {
-                  currentItem.StatusText = "(Failed)";
-                  throw new Exception($"Failed to scan item {currentItem.FilePath}. Check the log for more details.");
-                }
-                titles = indices;
-              }
-
-
-              for (int x = 0; x < titles.Length; x++)
-              {
-                string name = Path.GetFileNameWithoutExtension(currentItem.FilePath);
-                currentItem.StatusText = $"Encoding ({x + 1}/{titles.Length})";
-                currentItem.ProgressMaxValue = 100;
-                int step = currentItem.ProgressMaxValue / titles.Length;
-                int min = x * step;
-
-                ItemProgressUpdater progressUpdater = new ItemProgressUpdater(Dispatcher);
-                progressUpdater.Start();
-                void UpdateProgress(int percent)
-                {
-                  if (percent != currentItem.CurrentProgress)
-                  {
-                    currentItem.CurrentProgress = percent;
-                    int total = min + currentItem.CurrentProgress / step;
-                    currentItem.TotalProgress = total;
-                    progressUpdater.RequestUpdate(currentItem);
-                  }
-                }
-                int exitCode = await Handbrake.Encode(EncodePresetPath, preset, titles[x], outputPath, Path.Combine(encodePath, $"{name}_T{x}.mkv"), convertProcessToken, UpdateProgress);
-                progressUpdater.Stop();
-                if (convertProcessToken.IsCancellationRequested)
-                {
-                  for (int j = i; j < itemsToConvert.Count; j++)
-                  {
-                    itemsToConvert[j].StatusText = "(Cancelled)";
-                  }
-                  throw new TaskCanceledException();
-                }
-                if (exitCode != 0)
-                {
-                  currentItem.StatusText = "(Failed)";
-                  throw new Exception($"Failed to convert item {currentItem.FilePath}. Check the log for more details.");
-                }
-              }
-              currentItem.StatusText = "(Done)";
-              currentItem.ResetProgress();
+              string titleFolder = await ExtractTitlesFromDisk(outputPath, currentItem, convertProcessToken);
+              int[] titleIndices = await ScanDirectoryForTitles(currentItem, titleFolder);
+              await EncodeTitles(currentItem, titleFolder, encodePath, titleIndices);
             }
           }
           catch (TaskCanceledException ex)
           {
+            for (int j = itemsToConvert.IndexOf(currentItem); j < itemsToConvert.Count; j++)
+            {
+              itemsToConvert[j].StatusText = "(Cancelled)";
+            }
             App.Log.WriteLine("Conversion was aborted");
             MessageBox.Show($"Conversion was aborted", "Conversion Cancelled", MessageBoxButton.OK, MessageBoxImage.Information);
             if (closeRequested) Dispatcher.Invoke(Application.Current.Shutdown);
@@ -377,10 +303,25 @@ namespace Plex_Util
           }
           finally
           {
-            currentItem.ResetProgress();
+            currentItem?.ResetProgress();
             App.Log.WriteLine($"==================================== Done Converting ====================================");
           }
           if (error != null) throw error;
+          Dispatcher.Invoke(() =>
+          {
+            switch (whenDoneComboBox.SelectedIndex)
+            {
+              case 1: // sleep
+                Sleep();
+                break;
+              case 2: // shutdown
+                Shutdown();
+                break;
+              case 0: // Do nothing
+              default:
+                break;
+            }
+          });
         }
         catch (Exception ex)
         {
@@ -401,6 +342,126 @@ namespace Plex_Util
       });
     }
 
+    private async Task<string> ExtractTitlesFromDisk(string outputPath, MakeMKVItem currentItem, CancellationTokenSource cancellationToken)
+    {
+      if (currentItem.Type == EMakeMKVItemType.Mkv) return currentItem.FilePath;
+      if (Directory.Exists(outputPath) && !skipExistingItems)
+      {
+        Directory.Delete(outputPath, true);
+      }
+      if (!Directory.Exists(outputPath))
+      {
+        Directory.CreateDirectory(outputPath);
+        List<TitleInfo> selected = currentItem.GetSelectedTitles();
+        if (selected.Count == currentItem.TitleCount)
+        {
+          int exitCode = await MakeMKV.ExtractAllTitles(currentItem, outputPath, convertProcessToken, Dispatcher);
+          if (cancellationToken.IsCancellationRequested)
+          {
+            throw new TaskCanceledException();
+          }
+          if (exitCode != 0)
+          {
+            currentItem.StatusText = "(Failed)";
+            throw new Exception($"Failed to convert item {currentItem.FilePath}. Check the log for more details.");
+          }
+        }
+        else
+        {
+          // slow but ok
+          for (int x = 0; x < selected.Count; x++)
+          {
+            TitleInfo title = selected[x];
+            int exitCode = await MakeMKV.ExtractTitle(currentItem, outputPath, title, convertProcessToken, Dispatcher);
+            if (convertProcessToken.IsCancellationRequested)
+            {
+              throw new TaskCanceledException();
+            }
+            if (exitCode != 0)
+            {
+              currentItem.StatusText = "(Failed)";
+              throw new Exception($"Failed to convert item {currentItem.FilePath}. Check the log for more details.");
+            }
+          }
+        }
+      }
+      return outputPath;
+    }
+
+    private async Task<int[]> ScanDirectoryForTitles(MakeMKVItem currentItem, string directory)
+    {
+      currentItem.StatusText = "(Scanning for titles)";
+      currentItem.ResetProgress();
+      int[] titles;
+      {
+        ItemProgressUpdater progressUpdater = new ItemProgressUpdater(Dispatcher);
+        progressUpdater.Start();
+        currentItem.ProgressMaxValue = 100;
+        currentItem.TotalProgress = 0;
+        currentItem.CurrentProgress = 0;
+
+        (int exitCode, int[] indices, TitleInfo[] _) = await Handbrake.Scan(directory, convertProcessToken, percent =>
+        {
+          currentItem.TotalProgress = currentItem.CurrentProgress = percent;
+          progressUpdater.RequestUpdate(currentItem);
+        });
+
+        progressUpdater.Stop();
+        currentItem.ResetProgress();
+        currentItem.StatusText = string.Empty;
+        if (exitCode != 0)
+        {
+          currentItem.StatusText = "(Failed)";
+          throw new Exception($"Failed to scan item {currentItem.FilePath}. Check the log for more details.");
+        }
+        titles = indices;
+      }
+      return titles;
+    }
+
+    private async Task EncodeTitles(MakeMKVItem currentItem, string source, string encodePath, int[] titleIndices)
+    {
+      if (Directory.Exists(encodePath))
+      {
+        Directory.Delete(encodePath, true);
+      }
+      Directory.CreateDirectory(encodePath);
+      for (int x = 0; x < titleIndices.Length; x++)
+      {
+        string name = Path.GetFileNameWithoutExtension(currentItem.FilePath);
+        currentItem.StatusText = $"Encoding ({x + 1}/{titleIndices.Length})";
+        currentItem.ProgressMaxValue = 100;
+        int step = currentItem.ProgressMaxValue / titleIndices.Length;
+        int min = x * step;
+
+        ItemProgressUpdater progressUpdater = new ItemProgressUpdater(Dispatcher);
+        progressUpdater.Start();
+        void UpdateProgress(int percent)
+        {
+          if (percent != currentItem.CurrentProgress)
+          {
+            currentItem.CurrentProgress = percent;
+            int total = min + currentItem.CurrentProgress / step;
+            currentItem.TotalProgress = total;
+            progressUpdater.RequestUpdate(currentItem);
+          }
+        }
+        int exitCode = await Handbrake.Encode(EncodePresetPath, preset, titleIndices[x], source, Path.Combine(encodePath, $"{name}_T{x}.mkv"), convertProcessToken, UpdateProgress);
+        progressUpdater.Stop();
+        if (convertProcessToken.IsCancellationRequested)
+        {
+          throw new TaskCanceledException();
+        }
+        if (exitCode != 0)
+        {
+          currentItem.StatusText = "(Failed)";
+          throw new Exception($"Failed to convert item {currentItem.FilePath}. Check the log for more details.");
+        }
+      }
+      currentItem.StatusText = "(Done)";
+      currentItem.ResetProgress();
+
+    }
     private async Task Scan()
     {
       convertButton.IsEnabled = false;
@@ -417,12 +478,35 @@ namespace Plex_Util
           {
             while (processingList.Count > 0 && processingList.TryTake(out MakeMKVItem currentItem))
             {
-              if ((await MakeMKV.ScanTitles(currentItem, scanCancellationTokenSource, Dispatcher) != 0))
+              currentItem.StatusText = "(Scanning for titles)";
+              if (currentItem.Type != EMakeMKVItemType.Mkv)
               {
-                currentItem.Error = "Failed to scan item";
+                if ((await MakeMKV.ScanTitles(currentItem, scanCancellationTokenSource, Dispatcher) != 0))
+                {
+                  currentItem.Error = "Failed to scan item";
+                }
+                currentItem.ResetProgress();
+                currentItem.StatusText = string.Empty;
               }
-              currentItem.ResetProgress();
-              currentItem.StatusText = string.Empty;
+              else
+              {
+                ItemProgressUpdater progressUpdater = new ItemProgressUpdater(Dispatcher);
+                progressUpdater.Start();
+                currentItem.ProgressMaxValue = 100;
+                currentItem.TotalProgress = 0;
+                currentItem.CurrentProgress = 0;
+                (int exitCode, int[] indices, TitleInfo[] titles) = await Handbrake.Scan(currentItem.FilePath, new CancellationTokenSource(), percent =>
+                {
+                  currentItem.TotalProgress = currentItem.CurrentProgress = percent;
+                  progressUpdater.RequestUpdate(currentItem);
+                });
+                currentItem.Titles.Clear();
+                foreach (TitleInfo titleInfo in titles) currentItem.Titles.Add(titleInfo);
+                progressUpdater.Stop();
+                currentItem.SelectAllTitles();
+                currentItem.ResetProgress();
+                currentItem.StatusText = string.Empty;
+              }
             }
           }));
         }
@@ -524,5 +608,22 @@ namespace Plex_Util
 
     private string GetOutputPathForItem(DirectoryInfo outputDirectory, MakeMKVItem item) => Path.Combine(outputDirectory.FullName, Path.GetFileNameWithoutExtension(item.FilePath) + "_converted");
     private string GetEncodePathForItem(DirectoryInfo outputDirectory, MakeMKVItem item) => Path.Combine(outputDirectory.FullName, Path.GetFileNameWithoutExtension(item.FilePath) + "_encoded");
+
+    private void Shutdown()
+    {
+      //Test.Exit();
+      if (!Power.ExitWindowsEx(Windows.Win32.System.Shutdown.EXIT_WINDOWS_FLAGS.EWX_FORCE | Windows.Win32.System.Shutdown.EXIT_WINDOWS_FLAGS.EWX_SHUTDOWN | Windows.Win32.System.Shutdown.EXIT_WINDOWS_FLAGS.EWX_POWEROFF, 0))
+      {
+        int error = Marshal.GetLastWin32Error();
+        string errorMessage = Power.GetErrorMessage(error);
+        Console.WriteLine($"Failed to adjust token privileges. {errorMessage}");
+        return;
+      }
+    }
+
+    private void Sleep()
+    {
+      Power.SetSuspendState(false, true, true);
+    }
   }
 }

@@ -98,6 +98,19 @@ namespace Plex_Util
       }
     }
 
+    public EMakeMKVItemType Type
+    {
+      get => type;
+      set
+      {
+        if (type != value)
+        {
+          type = value;
+          OnPropertyChanged(nameof(Type));
+        }
+      }
+    }
+
     public int TitleCount
     {
       get => Titles.Count;
@@ -149,6 +162,7 @@ namespace Plex_Util
     private long size;
     private string error;
     private HashSet<int> selectedIndices;
+    private EMakeMKVItemType type;
 
     public event PropertyChangedEventHandler PropertyChanged;
 

@@ -4,5 +4,13 @@ Windows.Win32.Foundation.HWND
 Windows.Win32.Foundation.HRESULT
 Windows.Win32.System.Com.CoTaskMemFree
 Windows.Win32.UI.Shell.PropertiesSystem.IPropertyStore
+Windows.Win32.System.Power
+Windows.Win32.System.Shutdown
 IUnknown
 PKEY_Media_Duration
+windows.Win32.Foundation
+windows.Win32.Security
+Windows.Win32.System.Diagnostics.Debug.FORMAT_MESSAGE_OPTIONS
+OpenProcessToken
+AdjustTokenPrivileges
+FormatMessage

@@ -48,6 +48,31 @@ namespace Plex_Util
       plexList.ItemsSource = plexItems;
       App.OnDependenciesUpdated += HandleDependenciesUpdatedEvent;
       HandleDependenciesUpdatedEvent();
+      Filters.SetFilters(
+        new FilterBar.Filter()
+        {
+          filterProperty = nameof(PlexItem.FilePath),
+          Name = "FilePath"
+        },
+        new FilterBar.Filter()
+        {
+          filterProperty = nameof(PlexItem.Title),
+          Name = "Title"
+        }, new FilterBar.Filter()
+        {
+          filterProperty = nameof(PlexItem.Year),
+          Name = "Year"
+        }, new FilterBar.Filter()
+        {
+          filterProperty = nameof(PlexItem.Imdb),
+          Name = "IMDB"
+        }, new FilterBar.Filter()
+        {
+          filterProperty = nameof(PlexItem.HasWarnings),
+          Name = "Warnings"
+        }
+      );
+      Filters.Source = plexItems;
     }
 
     private void HandleDependenciesUpdatedEvent()
@@ -70,7 +95,7 @@ namespace Plex_Util
 
     private void HandleScanButtonClickedEvent(object sender, RoutedEventArgs e)
     {
-      if(string.IsNullOrEmpty(plexInput) || !Directory.Exists(plexInput))
+      if (string.IsNullOrEmpty(plexInput) || !Directory.Exists(plexInput))
       {
         MessageBox.Show(string.IsNullOrEmpty(plexInput) ? "No input folder specified." : $"Folder {plexInput} not found.", "Invalid input folder", MessageBoxButton.OK, MessageBoxImage.Error);
         return;
@@ -86,6 +111,7 @@ namespace Plex_Util
       }
 
       UpdatePlexVisibleItems();
+      Filters.ApplyDefaultFilter();
     }
 
     private void HandleSaveAllButtonClickedEvent(object sender, RoutedEventArgs e)
@@ -179,52 +205,52 @@ namespace Plex_Util
       view.Refresh();
     }
 
-    private void SortByTitleClick(object sender, RoutedEventArgs e)
-    {
-      plexSortYear.IsChecked = false;
-      plexSortImdb.IsChecked = false;
-      plexSortWarnings.IsChecked = false;
-      ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
-      view.SortDescriptions.Clear(); // Clear existing sort orders
-      view.SortDescriptions.Add(new SortDescription(plexSortTitle.IsChecked.HasValue && plexSortTitle.IsChecked.Value ? nameof(PlexItem.Title) : nameof(PlexItem.FilePath), ListSortDirection.Ascending)); // Sort by Name in ascending order
-      view.Refresh();
-    }
+    //private void SortByTitleClick(object sender, RoutedEventArgs e)
+    //{
+    //  plexSortYear.IsChecked = false;
+    //  plexSortImdb.IsChecked = false;
+    //  plexSortWarnings.IsChecked = false;
+    //  ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
+    //  view.SortDescriptions.Clear(); // Clear existing sort orders
+    //  view.SortDescriptions.Add(new SortDescription(plexSortTitle.IsChecked.HasValue && plexSortTitle.IsChecked.Value ? nameof(PlexItem.Title) : nameof(PlexItem.FilePath), ListSortDirection.Ascending)); // Sort by Name in ascending order
+    //  view.Refresh();
+    //}
 
-    private void SortByYearClick(object sender, RoutedEventArgs e)
-    {
+    //private void SortByYearClick(object sender, RoutedEventArgs e)
+    //{
 
-      plexSortTitle.IsChecked = false;
-      plexSortImdb.IsChecked = false;
-      plexSortWarnings.IsChecked = false;
-      ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
-      view.SortDescriptions.Clear(); // Clear existing sort orders
-      view.SortDescriptions.Add(new SortDescription(plexSortYear.IsChecked.HasValue && plexSortYear.IsChecked.Value ? nameof(PlexItem.Year) : nameof(PlexItem.FilePath), ListSortDirection.Ascending)); // Sort by Name in ascending order
-      view.Refresh();
-    }
+    //  plexSortTitle.IsChecked = false;
+    //  plexSortImdb.IsChecked = false;
+    //  plexSortWarnings.IsChecked = false;
+    //  ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
+    //  view.SortDescriptions.Clear(); // Clear existing sort orders
+    //  view.SortDescriptions.Add(new SortDescription(plexSortYear.IsChecked.HasValue && plexSortYear.IsChecked.Value ? nameof(PlexItem.Year) : nameof(PlexItem.FilePath), ListSortDirection.Ascending)); // Sort by Name in ascending order
+    //  view.Refresh();
+    //}
 
-    private void SortByImdbTagClick(object sender, RoutedEventArgs e)
-    {
-      plexSortTitle.IsChecked = false;
-      plexSortYear.IsChecked = false;
-      plexSortWarnings.IsChecked = false;
-      ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
-      view.SortDescriptions.Clear(); // Clear existing sort orders
-      view.SortDescriptions.Add(new SortDescription(plexSortImdb.IsChecked.HasValue && plexSortImdb.IsChecked.Value ? nameof(PlexItem.Imdb) : nameof(PlexItem.FilePath), ListSortDirection.Ascending)); // Sort by Name in ascending order
-      view.Refresh();
+    //private void SortByImdbTagClick(object sender, RoutedEventArgs e)
+    //{
+    //  plexSortTitle.IsChecked = false;
+    //  plexSortYear.IsChecked = false;
+    //  plexSortWarnings.IsChecked = false;
+    //  ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
+    //  view.SortDescriptions.Clear(); // Clear existing sort orders
+    //  view.SortDescriptions.Add(new SortDescription(plexSortImdb.IsChecked.HasValue && plexSortImdb.IsChecked.Value ? nameof(PlexItem.Imdb) : nameof(PlexItem.FilePath), ListSortDirection.Ascending)); // Sort by Name in ascending order
+    //  view.Refresh();
 
-    }
+    //}
 
-    private void SortByWarningTagClick(object sender, RoutedEventArgs e)
-    {
-      plexSortTitle.IsChecked = false;
-      plexSortYear.IsChecked = false;
-      plexSortImdb.IsChecked = false;
-      ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
-      view.SortDescriptions.Clear(); // Clear existing sort orders
-      view.SortDescriptions.Add(new SortDescription(plexSortWarnings.IsChecked.HasValue && plexSortWarnings.IsChecked.Value ? nameof(PlexItem.HasWarnings) : nameof(PlexItem.FilePath), ListSortDirection.Descending)); // Sort by Name in ascending order
-      view.Refresh();
+    //private void SortByWarningTagClick(object sender, RoutedEventArgs e)
+    //{
+    //  plexSortTitle.IsChecked = false;
+    //  plexSortYear.IsChecked = false;
+    //  plexSortImdb.IsChecked = false;
+    //  ICollectionView view = CollectionViewSource.GetDefaultView(plexItems);
+    //  view.SortDescriptions.Clear(); // Clear existing sort orders
+    //  view.SortDescriptions.Add(new SortDescription(plexSortWarnings.IsChecked.HasValue && plexSortWarnings.IsChecked.Value ? nameof(PlexItem.HasWarnings) : nameof(PlexItem.FilePath), ListSortDirection.Descending)); // Sort by Name in ascending order
+    //  view.Refresh();
 
-    }
+    //}
 
     private void HandleOpenWinScpButtonClickedEvent(object sender, RoutedEventArgs e)
     {

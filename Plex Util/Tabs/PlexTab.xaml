@@ -7,51 +7,48 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
   <TabItem.Header>
-      <StackPanel>
-        <TextBlock>Plex Metadata</TextBlock>
-      </StackPanel>
-    </TabItem.Header>
-    <Grid>
+    <StackPanel>
+      <TextBlock>Plex Metadata</TextBlock>
+    </StackPanel>
+  </TabItem.Header>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="auto"></RowDefinition>
+      <RowDefinition Height="auto"></RowDefinition>
+      <RowDefinition Height="*"></RowDefinition>
+      <RowDefinition Height="auto"></RowDefinition>
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="1" Grid.ColumnSpan="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"></ColumnDefinition>
+        <ColumnDefinition></ColumnDefinition>
+      </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
         <RowDefinition Height="auto"></RowDefinition>
         <RowDefinition Height="auto"></RowDefinition>
-        <RowDefinition Height="*"></RowDefinition>
         <RowDefinition Height="auto"></RowDefinition>
       </Grid.RowDefinitions>
 
-      <Grid Grid.Row="1" Grid.ColumnSpan="2">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto"></ColumnDefinition>
-          <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="auto"></RowDefinition>
-          <RowDefinition Height="auto"></RowDefinition>
-          <RowDefinition Height="auto"></RowDefinition>
-        </Grid.RowDefinitions>
+      <Label Grid.Column="0" Grid.Row="0" Name="plexInputLabel" Content="Input Folder:"  Margin="5"></Label>
+      <local:PathSelectControl Grid.Column="1" Grid.Row="0" Path="{Binding PlexInput, Mode=TwoWay}"></local:PathSelectControl>
 
-        <Label Grid.Column="0" Grid.Row="1" Name="plexInputLabel" Content="Input Folder:"  Margin="5"></Label>
-        <local:PathSelectControl Grid.Column="1" Grid.Row="1" Path="{Binding PlexInput, Mode=TwoWay}"></local:PathSelectControl>
-
-        <Label Grid.Column="0" Grid.Row="2" Name="plexSearchLabel" Content="Search:"  Margin="5"></Label>
-        <DockPanel LastChildFill="True"  Grid.Column="1" Grid.Row="2" VerticalAlignment="Stretch" Margin="5" >
-          <TextBox DockPanel.Dock="Left" LostFocus="SearchFocusLost" KeyDown="SearchKeyDown"  HorizontalAlignment="Stretch"  VerticalAlignment="Center" Name="plexSearchInput"></TextBox>
-        </DockPanel>
-        <Label Grid.Column="0" Grid.Row="3" Name="plexSortLabel" Content="Sort By:"  Margin="5"></Label>
-        <StackPanel Orientation="Horizontal"  Grid.Column="1" Grid.Row="3" VerticalAlignment="Stretch" Margin="5" >
-          <ToggleButton  Margin="5,0" Padding="5,0"  VerticalAlignment="Center" Name="plexSortTitle" Click="SortByTitleClick" Content="Title"></ToggleButton>
-          <ToggleButton Margin="5,0" Padding="5,0"  VerticalAlignment="Center"  Name="plexSortYear" Click="SortByYearClick" Content="Year"></ToggleButton>
-          <ToggleButton  Margin="5,0" Padding="5,0"  VerticalAlignment="Center" Name="plexSortImdb" Click="SortByImdbTagClick" Content="Imdb"></ToggleButton>
-          <ToggleButton  Margin="5,0" Padding="5,0"  VerticalAlignment="Center" Name="plexSortWarnings" Click="SortByWarningTagClick" Content="Warnings"></ToggleButton>
-        </StackPanel>
-      </Grid>
-      <ListView AlternationCount="2" Grid.ColumnSpan="2" HorizontalContentAlignment="Stretch" Name="plexList" Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-        <ListView.ItemTemplate>
-          <DataTemplate>
-            <local:PlexItemControl></local:PlexItemControl>
-          </DataTemplate>
-        </ListView.ItemTemplate>
-      </ListView>
+      <Label Grid.Column="0" Grid.Row="1" Name="plexSearchLabel" Content="Search:"  Margin="5"></Label>
+      <DockPanel LastChildFill="True"  Grid.Column="1" Grid.Row="1" VerticalAlignment="Stretch" Margin="5" >
+        <TextBox DockPanel.Dock="Left" LostFocus="SearchFocusLost" KeyDown="SearchKeyDown"  HorizontalAlignment="Stretch"  VerticalAlignment="Center" Name="plexSearchInput"></TextBox>
+      </DockPanel>
+      
+      
+      <Label Grid.Column="0" Grid.Row="2" Name="plexSortLabel" Content="Sort By:"  Margin="5"></Label>
+      <local:FilterBar x:Name="Filters" Grid.Column="1" Grid.Row="2"/>
+    </Grid>
+    <ListView AlternationCount="2" Grid.ColumnSpan="2" HorizontalContentAlignment="Stretch" Name="plexList" Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <local:PlexItemControl></local:PlexItemControl>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
       <Button Name="plexScanButton" Click="HandleScanButtonClickedEvent" Content="Scan" Margin="5,0" Padding="5,0"></Button>
       <Button Name="plexSaveAllScanButton" Click="HandleSaveAllButtonClickedEvent" Content="Save All" Margin="5,0" Padding="5,0"></Button>

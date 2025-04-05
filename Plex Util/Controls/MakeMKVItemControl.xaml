@@ -12,18 +12,20 @@
   </Control.Resources>
   <Grid  HorizontalAlignment="Stretch" Margin="5,2">
     <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="1.5*" ></ColumnDefinition>
       <ColumnDefinition Width="8*" ></ColumnDefinition>
       <ColumnDefinition Width="3*" ></ColumnDefinition>
       <ColumnDefinition Width="3*" ></ColumnDefinition>
-      <ColumnDefinition Width="160" ></ColumnDefinition>
-      <ColumnDefinition Width="160"></ColumnDefinition>
+      <ColumnDefinition Width="120" ></ColumnDefinition>
+      <ColumnDefinition Width="120"></ColumnDefinition>
       <ColumnDefinition Width="3*"></ColumnDefinition>
       <ColumnDefinition Width="auto" ></ColumnDefinition>
       <ColumnDefinition Width="auto" ></ColumnDefinition>
       <ColumnDefinition Width="auto" ></ColumnDefinition>
     </Grid.ColumnDefinitions>
-    <TextBlock x:Name="errorMessage" VerticalAlignment="Center" Grid.Column="0" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding Error, UpdateSourceTrigger=PropertyChanged}" Foreground="Red"></TextBlock>
-    <TextBlock VerticalAlignment="Center" Grid.Column="0" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding FilePath}">
+    <TextBlock VerticalAlignment="Center" Grid.Column="0" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding Type}"></TextBlock>
+    <TextBlock x:Name="errorMessage" VerticalAlignment="Center" Grid.Column="1" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding Error, UpdateSourceTrigger=PropertyChanged}" Foreground="Red"></TextBlock>
+    <TextBlock VerticalAlignment="Center" Grid.Column="1" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding FilePath}">
       <TextBlock.Style>
         <Style TargetType="TextBlock">
           <Setter Property="Visibility" Value="Visible" />
@@ -36,19 +38,19 @@
       </TextBlock.Style>
 
     </TextBlock>
-    <TextBlock VerticalAlignment="Center" Grid.Column="1" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding SizeText, UpdateSourceTrigger=PropertyChanged}" ></TextBlock>
-    <TextBlock VerticalAlignment="Center" Grid.Column="2" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding TitleCountText, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-    <local:ProgressControl Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Text="{Binding CurrentProgressText}" Maximum="{Binding ProgressMaxValue, Mode=TwoWay}" Value="{Binding CurrentProgress, Mode=TwoWay}" Visibility="{Binding HasProgress, Mode=TwoWay, Converter={StaticResource BoolToVis}}"></local:ProgressControl>
-    <local:ProgressControl Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Text="{Binding TotalProgressText}" Maximum="{Binding ProgressMaxValue, Mode=TwoWay}" Value="{Binding TotalProgress, Mode=TwoWay}" Visibility="{Binding HasProgress, Mode=TwoWay, Converter={StaticResource BoolToVis}}"></local:ProgressControl>
+    <TextBlock VerticalAlignment="Center" Grid.Column="2" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding SizeText, UpdateSourceTrigger=PropertyChanged}" ></TextBlock>
+    <TextBlock VerticalAlignment="Center" Grid.Column="3" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch" Margin="5,5" Text="{Binding TitleCountText, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+    <local:ProgressControl Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Text="{Binding CurrentProgressText}" Maximum="{Binding ProgressMaxValue, Mode=TwoWay}" Value="{Binding CurrentProgress, Mode=TwoWay}" Visibility="{Binding HasProgress, Mode=TwoWay, Converter={StaticResource BoolToVis}}"></local:ProgressControl>
+    <local:ProgressControl Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Text="{Binding TotalProgressText}" Maximum="{Binding ProgressMaxValue, Mode=TwoWay}" Value="{Binding TotalProgress, Mode=TwoWay}" Visibility="{Binding HasProgress, Mode=TwoWay, Converter={StaticResource BoolToVis}}"></local:ProgressControl>
 
-    <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Grid.Column="5" HorizontalAlignment="Left" MinWidth="100" Text="{Binding StatusText, Mode=TwoWay}"></TextBlock>
-    <Button Style="{StaticResource ActionButton}" Background="red" Click="RemoveItemClick" ToolTip="Remove" Padding="0,2" Margin="5,0" Grid.Column="6" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+    <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Grid.Column="6" HorizontalAlignment="Left" MinWidth="100" Text="{Binding StatusText, Mode=TwoWay}"></TextBlock>
+    <Button Style="{StaticResource ActionButton}" Background="red" Click="RemoveItemClick" ToolTip="Remove" Padding="0,2" Margin="5,0" Grid.Column="7" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
       <Image Source="/Resources/Images/bin.png" Height="14"></Image>
     </Button>
-    <Button Style="{StaticResource ActionButton}" Click="CopyItemClick" ToolTip="Copy Path" Padding="0,2" Margin="5,0" Grid.Column="7" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+    <Button Style="{StaticResource ActionButton}" Click="CopyItemClick" ToolTip="Copy Path" Padding="0,2" Margin="5,0" Grid.Column="8" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
       <Image Source="/Resources/Images/copy.png" Height="14"></Image>
     </Button>
-    <Button Style="{StaticResource ActionButton}" Visibility="{Binding ShowRemoveButton, Converter={StaticResource BoolToVis}, ConverterParameter=True}" Click="ModifyItemClicked" ToolTip="modify" Padding="0,2" Margin="5,0" Grid.Column="8" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
+    <Button Style="{StaticResource ActionButton}" Visibility="{Binding ShowRemoveButton, Converter={StaticResource BoolToVis}, ConverterParameter=True}" Click="ModifyItemClicked" ToolTip="modify" Padding="0,2" Margin="5,0" Grid.Column="9" VerticalAlignment="Center" MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}">
       <Image Source="/Resources/Images/modify.png" Height="14"></Image>
     </Button>
   </Grid>
