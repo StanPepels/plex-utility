@@ -37,5 +37,17 @@ namespace Plex_Util
         Item.ToggleTitle(item);
       }
     }
+    private void HandleSelectAllButtonClickedEvent(object sender, RoutedEventArgs e)
+    {
+      Item.SelectAllTitles();
+      CollectionViewSource.GetDefaultView(titleList.ItemsSource)?.Refresh();
+    }
+    private void HandleDeselectAllButtonClickedEvent(object sender, RoutedEventArgs e)
+    {
+      Item.DeselectAllTitles();
+      CollectionViewSource.GetDefaultView(titleList.ItemsSource)?.Refresh();
+
+    }
   }
 }
+

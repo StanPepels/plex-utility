@@ -94,6 +94,5 @@
       <Button Name="openMakeMKVButton" Click="OpenMakeMkvClick" Content="Open MakeMkv" Margin="5,0" Padding="5,0"></Button>
       <Button Name="openHandbrakeButton" Click="OpenHandbrakeClick" Content="Open Handbrake" Margin="5,0" Padding="5,0"></Button>
     </StackPanel>
-    <local:ProgressControl x:Name="progressBar"  Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5" Visibility="Collapsed"></local:ProgressControl>
   </Grid>
 </TabItem>

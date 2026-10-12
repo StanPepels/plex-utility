@@ -10,7 +10,16 @@
     <local:ItemAndViewModelToCheckedConverter x:Key="ItemAndViewModelToCheckedConverter" />
   </Window.Resources>
   <Grid>
-    <ListView AlternationCount="2" Name="titleList" ItemsSource="{Binding Item.Titles}" HorizontalContentAlignment="Stretch">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="auto"></RowDefinition>
+      <RowDefinition Height="*"></RowDefinition>
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0"  Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5">
+      <Button Name="selectButton" Click="HandleSelectAllButtonClickedEvent" Content="Select All" Margin="5,0" Padding="5,0"></Button>
+      <Button Name="deselectButton" Click="HandleDeselectAllButtonClickedEvent" Content="Deselect All" Margin="5,0" Padding="5,0"></Button>
+
+    </StackPanel >
+      <ListView Grid.Row="1" AlternationCount="2" Name="titleList" ItemsSource="{Binding Item.Titles}" HorizontalContentAlignment="Stretch">
       <ListView.ItemTemplate>
 
         <DataTemplate>

@@ -234,6 +234,20 @@ namespace Plex_Util
       return selectedIndices.Contains(Titles.IndexOf(info));
     }
 
+    public bool IsTitleSelected(string titleName)
+    {
+      int index = -1;
+      for (int i = 0; i < TitleCount; i++)
+      {
+        if (Titles[i].Name == titleName)
+        {
+          index = i;
+          break;
+        }
+      }
+      return selectedIndices.Contains(index);
+    }
+
     public List<TitleInfo> GetSelectedTitles()
     {
       return selectedIndices.Select(index => Titles[index]).ToList();

@@ -250,8 +250,6 @@ namespace Plex_Util
           }
           Dispatcher.Invoke(() =>
           {
-            progressBar.Visibility = Visibility.Visible;
-            progressBar.Value = 0.0d;
             convertButton.IsEnabled = false;
             cancelButton.IsEnabled = true;
           });
@@ -273,11 +271,7 @@ namespace Plex_Util
               }
               currentItem = itemsToConvert[i];
               currentItem.StatusText = "(Processing)";
-              Dispatcher.Invoke(() =>
-              {
-                progressBar.Text = $"({i}/{itemsToConvert.Count})";
-                progressBar.Value = (double)(i) / (double)itemsToConvert.Count;
-              });
+              
 
               string outputPath = GetOutputPathForItem(outputDirectory, currentItem);
               string encodePath = GetEncodePathForItem(encodeDirectory, currentItem);
@@ -336,7 +330,6 @@ namespace Plex_Util
         {
           Dispatcher.Invoke(() =>
           {
-            progressBar.Visibility = Visibility.Collapsed;
             convertButton.IsEnabled = true;
             cancelButton.IsEnabled = false;
             convertProcessToken.Dispose();

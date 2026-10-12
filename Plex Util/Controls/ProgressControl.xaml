@@ -43,8 +43,8 @@
       </Setter>
     </Style>
   </Control.Resources>
-  <Grid>
-    <ProgressBar Background="LightGray"  Style="{StaticResource GradientProgressBarStyle}" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProgressControl}}, Path=Value}" Maximum="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProgressControl}}, Path=Maximum}" Name="progressBarContent" Width="150" Minimum="0"/>
+  <Grid HorizontalAlignment="Stretch">
+    <ProgressBar HorizontalAlignment="Stretch" Background="LightGray"  Style="{StaticResource GradientProgressBarStyle}" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProgressControl}}, Path=Value}" Maximum="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProgressControl}}, Path=Maximum}" Name="progressBarContent" Minimum="0"/>
     <TextBlock Name="progressBarText" Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ProgressControl}}, Path=Text}" HorizontalAlignment="Center"></TextBlock>
   </Grid>
 </UserControl>

@@ -60,6 +60,7 @@ namespace Plex_Util
                 while (itemsToUpdate.Count > 0 && itemsToUpdate.TryRemove(itemsToUpdate.Count - 1, out MakeMKVItem item))
                 {
                   item.NotifyProgressChanged();
+                  Thread.Sleep(1);
                 }
               }
               finally
@@ -72,6 +73,7 @@ namespace Plex_Util
             });
             Thread.Sleep(10);
           }
+          Thread.Sleep(1);
         }
       });
       processingTask.Start();
